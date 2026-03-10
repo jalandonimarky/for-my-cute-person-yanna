@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4c2d0">
+<title>For You</title>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Quicksand',sans-serif;background:linear-gradient(160deg,#fdf2f4,#fef6f0,#fce8f0);color:#5c3a4a;display:flex;align-items:center;justify-content:center}
+
+/* ─── Floating Hearts ─── */
+.hearts{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.hearts span{position:absolute;bottom:-40px;font-size:18px;opacity:0.12;animation:floatUp linear infinite}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0deg);opacity:0.12}50%{opacity:0.18}100%{transform:translateY(-110vh) rotate(45deg);opacity:0}}
+
+/* ─── Intro Screen ─── */
+#intro{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;z-index:10;transition:opacity 0.8s ease,transform 0.8s ease}
+#intro.leaving{opacity:0;transform:translateY(-60px)}
+.whisper{font-size:0.85rem;font-weight:600;color:#c08090;letter-spacing:1.5px;text-transform:lowercase;animation:softPulse 3s ease-in-out infinite}
+@keyframes softPulse{0%,100%{opacity:0.6}50%{opacity:1}}
+
+/* ─── Cassette ─── */
+.cassette{width:280px;height:178px;position:relative;animation:gentleFloat 4s ease-in-out infinite}
+@keyframes gentleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.cassette-body{width:100%;height:100%;background:linear-gradient(170deg,#f9d4de,#f0b8c8);border-radius:18px;border:3px solid #e8a4b8;position:relative;box-shadow:0 8px 30px rgba(200,120,150,0.2),inset 0 2px 0 rgba(255,255,255,0.4)}
+.cassette-label{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.6);padding:6px 24px;border-radius:6px;font-family:'Caveat',cursive;font-size:1.1rem;font-weight:600;color:#c06080;letter-spacing:0.5px}
+.cassette-window{position:absolute;top:52px;left:50%;transform:translateX(-50%);width:190px;height:62px;background:rgba(255,255,255,0.25);border-radius:10px;border:2px solid #e0a0b8;display:flex;align-items:center;justify-content:space-around;backdrop-filter:blur(2px)}
+.reel{width:42px;height:42px;border-radius:50%;border:3px solid #d4789c;background:radial-gradient(circle,#fef6f0 30%,#f9e0e8 70%);position:relative}
+.reel::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:10px;border-radius:50%;background:#d4789c}
+.reel.spinning{animation:spin 0.7s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.tape-strip{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:160px;height:4px;background:#e0a0b8;border-radius:2px}
+.screw{position:absolute;bottom:10px;width:8px;height:8px;border-radius:50%;background:#e0a0b8;border:1px solid #d4789c}
+.screw.left{left:18px}
+.screw.right{right:18px}
+
+/* ─── Play Button ─── */
+.play-btn{background:linear-gradient(135deg,#f0a0b8,#e080a0);border:none;color:#fff;padding:14px 36px;border-radius:50px;font-family:'Quicksand',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:1px;box-shadow:0 4px 20px rgba(220,100,140,0.35);transition:all 0.2s ease;position:relative;overflow:hidden}
+.play-btn:active{transform:scale(0.95)}
+.play-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,0.2));pointer-events:none}
+
+/* ─── Message Screen ─── */
+#message{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10;padding:20px;overflow-y:auto}
+.letter{background:#fff;border-radius:20px;padding:40px 32px 36px;max-width:520px;width:100%;box-shadow:0 12px 50px rgba(180,100,130,0.15);position:relative;transform:translateY(40px);opacity:0;transition:all 0.8s ease}
+.letter.visible{transform:translateY(0);opacity:1}
+.letter::before{content:'';position:absolute;top:-1px;left:40px;right:40px;height:3px;background:linear-gradient(90deg,transparent,#f0b8c8,transparent);border-radius:2px}
+.letter p{font-size:0.95rem;line-height:1.75;margin-bottom:18px;opacity:0;transform:translateY(12px);transition:all 0.6s ease;color:#5c3a4a}
+.letter p.show{opacity:1;transform:translateY(0)}
+.letter p:first-child::first-line{font-weight:600}
+.signature{font-family:'Caveat',cursive;font-size:1.35rem;color:#c06080;text-align:right;margin-top:28px;padding-top:20px;border-top:1px solid #fce8f0;opacity:0;transform:translateY(12px);transition:all 0.6s ease;line-height:1.5}
+.signature.show{opacity:1;transform:translateY(0)}
+.end-heart{text-align:center;font-size:1.4rem;margin-top:16px;opacity:0;transition:opacity 1s ease}
+.end-heart.show{opacity:0.5;animation:heartBeat 2s ease-in-out infinite}
+@keyframes heartBeat{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+
+/* ─── Responsive ─── */
+@media(max-width:480px){
+  .cassette{width:240px;height:152px}
+  .cassette-window{width:160px;height:52px;top:46px}
+  .reel{width:36px;height:36px}
+  .cassette-label{font-size:1rem;padding:5px 18px;top:11px}
+  .tape-strip{bottom:18px;width:130px}
+  .screw{bottom:8px}
+  .letter{padding:30px 22px 28px;border-radius:16px}
+  .letter p{font-size:0.88rem}
+  .signature{font-size:1.2rem}
+}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Floating hearts background -->
+<div class="hearts" id="hearts"></div>
+
+<!-- ═══ CASSETTE SCREEN ═══ -->
+<div id="intro">
+  <p class="whisper">someone left you a message...</p>
+  <div class="cassette">
+    <div class="cassette-body">
+      <div class="cassette-label">for you</div>
+      <div class="cassette-window">
+        <div class="reel" id="reelL"></div>
+        <div class="reel" id="reelR"></div>
+      </div>
+      <div class="tape-strip"></div>
+      <div class="screw left"></div>
+      <div class="screw right"></div>
+    </div>
+  </div>
+  <button class="play-btn" onclick="startPlayback()">&#9654;&ensp;press play</button>
+</div>
+
+<!-- ═══ MESSAGE SCREEN ═══ -->
+<div id="message" class="hidden">
+  <div class="letter" id="letter">
+    <p>Hello Yanna! Gusto ko lang pala sabihinnnn sayooo na lahat tayo ay may chapter ng buhay na sana naging madali. May mga moments na how we wish sana hindi nangyari. Pero I hope palagi mong tandaan na this doesn't define who you are. They're just roads that shaped us into the person we are now.</p>
+
+    <p>I'll be your palagiii. I'll be your unan in times you feel like you want to cry yourself to sleep. I'll be the quiet presence beside you on days when words feel heavy and everything feels too much.</p>
+
+    <p>Hindi mo kailangang dalhin lahat mag-isa. If your heart ever feels tired, you can rest here for a while. Walang pressure maging strong all the time. You're allowed to be soft, you're allowed to have moments where you just need someone to stay.</p>
+
+    <p>And even on days when you doubt yourself, when those bruises from the past try to remind you of pain, I hope you also remember that someone is here who sees more than those scars. Someone who sees your heart, your sincerity, and the way you still choose to care despite everything.</p>
+
+    <p>And that version of you. The real one. You areee someone worth holding close.</p>
+
+    <p>I know I might make mistakes, I might fall short sometimes, but this will not stop me from doing the promises I made.</p>
+
+    <div class="signature" id="signature">
+      Palagi kang pipiliin,<br>Marky
+    </div>
+    <div class="end-heart" id="endHeart">&#10084;</div>
+  </div>
+</div>
+
+<script>
+// ─── Floating Hearts ───
+(function(){
+  const c=document.getElementById('hearts');
+  const symbols=['♥','♡','❤','💕'];
+  for(let i=0;i<10;i++){
+    const s=document.createElement('span');
+    s.textContent=symbols[i%symbols.length];
+    s.style.left=Math.random()*100+'%';
+    s.style.fontSize=(14+Math.random()*12)+'px';
+    s.style.animationDuration=(8+Math.random()*12)+'s';
+    s.style.animationDelay=(Math.random()*10)+'s';
+    c.appendChild(s);
+  }
+})();
+
+// ─── Music Box (Web Audio API) ───
+let audioCtx=null;
+function createMusicBox(){
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+
+  function playNote(freq,startTime,dur,vol){
+    // Main tone (triangle = music box timbre)
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type='triangle';
+    osc.frequency.value=freq;
+    gain.gain.setValueAtTime(0,startTime);
+    gain.gain.linearRampToValueAtTime(vol,startTime+0.008);
+    gain.gain.exponentialRampToValueAtTime(0.001,startTime+dur);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(startTime);
+    osc.stop(startTime+dur+0.05);
+
+    // Soft harmonic overtone for sparkle
+    const osc2=audioCtx.createOscillator();
+    const gain2=audioCtx.createGain();
+    osc2.type='sine';
+    osc2.frequency.value=freq*2;
+    gain2.gain.setValueAtTime(0,startTime);
+    gain2.gain.linearRampToValueAtTime(vol*0.15,startTime+0.005);
+    gain2.gain.exponentialRampToValueAtTime(0.001,startTime+dur*0.6);
+    osc2.connect(gain2);
+    gain2.connect(audioCtx.destination);
+    osc2.start(startTime);
+    osc2.stop(startTime+dur+0.05);
+  }
+
+  // Note frequencies
+  const C5=523.25,D5=587.33,E5=659.25,G5=783.99,A5=880.00,B5=987.77,C6=1046.50,D6=1174.66,E6=1318.51;
+
+  // Sweet music box melody (two passes)
+  const melody=[
+    // Pass 1: Gentle ascending arpeggios
+    [E5,0.45],[G5,0.45],[A5,0.45],[C6,0.65],
+    [A5,0.45],[G5,0.45],[E5,0.65],
+    // Variation
+    [D5,0.45],[G5,0.45],[A5,0.45],[B5,0.65],
+    [A5,0.45],[G5,0.45],[E5,0.65],
+    // Descent
+    [C6,0.45],[A5,0.45],[G5,0.45],[E5,0.45],[D5,0.45],[C5,0.85],
+    // Gentle ending
+    [E5,0.55],[G5,0.55],[C6,1.2],
+    // Pass 2: Softer repeat
+    [E5,0.45],[G5,0.45],[A5,0.45],[C6,0.65],
+    [B5,0.45],[A5,0.45],[G5,0.65],
+    [A5,0.45],[C6,0.45],[E6,0.55],[D6,0.65],
+    [C6,0.45],[A5,0.45],[G5,0.65],
+    [E5,0.55],[G5,0.55],[C6,1.5],
+  ];
+
+  let t=audioCtx.currentTime+0.1;
+  const gap=0.28;
+  melody.forEach(([freq,dur],i)=>{
+    const vol=i<melody.length/2?0.18:0.12; // Second pass is softer
+    playNote(freq,t,dur,vol);
+    t+=gap;
+  });
+
+  // Ambient wind-down notes (very quiet, continue during message)
+  const ambientStart=t+1;
+  const ambient=[[E5,1.2],[G5,1.2],[C6,1.8],[A5,1.2],[E5,1.2],[G5,1.2],[C6,2.0]];
+  let at=ambientStart;
+  ambient.forEach(([freq,dur])=>{
+    playNote(freq,at,dur,0.06);
+    at+=1.8;
+  });
+}
+
+// ─── Playback Flow ───
+function startPlayback(){
+  // Start audio (must be from user gesture for mobile)
+  createMusicBox();
+
+  // Spin reels
+  document.getElementById('reelL').classList.add('spinning');
+  document.getElementById('reelR').classList.add('spinning');
+
+  // Hide play button
+  const btn=document.querySelector('.play-btn');
+  btn.style.opacity='0';btn.style.pointerEvents='none';
+
+  // Update whisper text
+  const whisper=document.querySelector('.whisper');
+  whisper.textContent='playing...';
+  whisper.style.animation='none';whisper.style.opacity='0.8';
+
+  // After melody plays a bit, transition to message
+  setTimeout(()=>{
+    document.getElementById('intro').classList.add('leaving');
+  },4500);
+
+  setTimeout(()=>{
+    document.getElementById('intro').classList.add('hidden');
+    document.getElementById('message').classList.remove('hidden');
+    document.body.style.overflow='auto';
+
+    // Show letter card
+    setTimeout(()=>{
+      document.getElementById('letter').classList.add('visible');
+    },100);
+
+    // Stagger paragraphs
+    const paragraphs=document.querySelectorAll('#letter p');
+    paragraphs.forEach((p,i)=>{
+      setTimeout(()=>p.classList.add('show'),600+i*700);
+    });
+
+    // Show signature after all paragraphs
+    const sigDelay=600+paragraphs.length*700+400;
+    setTimeout(()=>document.getElementById('signature').classList.add('show'),sigDelay);
+
+    // Show heart after signature
+    setTimeout(()=>document.getElementById('endHeart').classList.add('show'),sigDelay+800);
+  },5300);
+}
+</script>
+</body>
+</html>
